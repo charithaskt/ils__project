@@ -1,5 +1,5 @@
 """
-WSGI config for custom_user_model project.
+WSGI config for model_reports project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

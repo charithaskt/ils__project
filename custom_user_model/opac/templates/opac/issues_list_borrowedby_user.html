@@ -11,7 +11,7 @@
         <a href="{% url 'biblio-detail' issueinst.item.biblionumber.pk %}">{{issueinst.item.biblionumber.title}}</a> ({{ issueinst.date_due }})       
         {% if perms.accounts.can_self_renew %}
              {% if renewalsallowed > issueinst.renewals %}
-                 - <span><a href="{% url 'renew-book-self' issueinst.id %}" style="color:green;">(Renew)</a> </span>
+                 - <span><a href="{% url 'renew-book-self' issueinst.id %}" style="color:green;">(Renew) {{ issueinst.item.biblionumber.pk}}/{{issuelength}}</a> </span>
              {% endif %}
         {% endif %} 
       </li>

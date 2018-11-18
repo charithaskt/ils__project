@@ -293,7 +293,6 @@ class Biblio(models.Model):
     timestamp_added = models.DateTimeField(auto_now_add=True) #system generated
     
     class Meta:
-        #unique_together = ['title','pages']  #ISBN is supposed to be the key
         ordering = ['title',]
     '''
     def __str__(self):
