@@ -121,7 +121,7 @@ def biblios_listing(request):
 from django_tables2 import MultiTableMixin
 from django.views.generic.base import TemplateView
 class BibliosTablesView(MultiTableMixin, TemplateView):
-    template_name = 'tutorial/multiTable.html'
+    template_name = 'intranet/multiTable.html'
     qs = Biblio.objects.all()
     tables = [
         BiblioTable(qs),
@@ -133,29 +133,36 @@ class BibliosTablesView(MultiTableMixin, TemplateView):
 
 from django_filters.views import FilterView
 from django_tables2.views import SingleTableMixin
+from django_tables2.export.views import ExportMixin
 
 import django_filters
-
+from intranet.models import itemtype_choices, Genre
 class BibliosFilter(django_filters.FilterSet):
     title = django_filters.CharFilter(lookup_expr='icontains', label='Title')
-    copyrightdate = django_filters.CharFilter(lookup_expr='iexact', label='Year')
+    #copyrightdate = django_filters.CharFilter(lookup_expr='iexact', label='Year')
+    copyrightdate = django_filters.RangeFilter(lookup_expr='iexact', label='Year')
     pages = django_filters.CharFilter(lookup_expr='iexact', label='Pages')
     edition = django_filters.CharFilter(lookup_expr='iexact', label='Edition')
     authors__firstname = django_filters.CharFilter(lookup_expr='icontains', label='Author First Name')
     authors__lastname = django_filters.CharFilter(lookup_expr='icontains', label='Author Last Name')
-    genre__name  = django_filters.CharFilter(lookup_expr='icontains', label='Subject')
+    #genre__name  = django_filters.CharFilter(lookup_expr='icontains', label='Subject')
     callnumber  = django_filters.CharFilter(lookup_expr='icontains', label='Call Number')
-
+    #itemtype   = django_filters.ChoiceFilter(choices=itemtype_choices, empty_label='Select - Item Type')
+    itemtype   = django_filters.MultipleChoiceFilter(choices=itemtype_choices)
+    genre__name = django_filters.ModelChoiceFilter(queryset=Genre.objects.all(),empty_label='Select - Subject Heading')
     class Meta:
         model = Biblio
-        fields = ['biblionumber','title', 'authors__firstname','authors__lastname','genre__name','copyrightdate','pages','edition']
+        fields = ['biblionumber','title', 'authors__firstname','authors__lastname','genre__name','copyrightdate','pages','edition','itemtype']
 
 
-class FilteredBibliosListView(SingleTableMixin, FilterView):
+class FilteredBibliosListView(ExportMixin,SingleTableMixin, FilterView):
     table_class = BiblioTable
     model = Biblio
     template_name = 'intranet/filtered_biblios.html'
+    #template_name = 'django_tables2/bootstrap.html'
     filterset_class = BibliosFilter
+    exclude_columns = ('selection','biblio')
+    #to export the filtered results of the table just add &_export=fmt where fmt in ['csv','json','xls']
 
 from django_tables2.config import RequestConfig
 from django_tables2.export.export import TableExport
@@ -170,7 +177,14 @@ def biblios_table_export_view(request):
     if TableExport.is_valid_format(export_format):
         exporter = TableExport(export_format, table, exclude_columns=('selection','biblio'))
         return exporter.response('bibliostable.{}'.format(export_format))
-    return render(request, 'tutorial/biblios_export.html', {
+    return render(request, 'intranet/biblios_export.html', {
         'table': table
     })
 
+'''
+fromm djqscsv import write_csv
+
+qs = Foo.objects.filter(bar=True).values('id', 'bar')
+with open('foo.csv', 'wb') as csv_file:
+  write_csv(qs, csv_file)
+'''

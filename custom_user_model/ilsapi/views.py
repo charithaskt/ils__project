@@ -629,7 +629,7 @@ class BibliosByTitleListView(generics.ListAPIView):
     #GET biblios/byTitle/<str:title>
     queryset = Biblio.objects.all()
     serializer_class = BibliosShowSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    #permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         #
@@ -1303,7 +1303,7 @@ class PatronPhotosDetailView(generics.RetrieveUpdateDestroyAPIView):
     def delete(self, request, *args, **kwargs):
         try:
             a_patronphoto = self.queryset.get(pk=kwargs["pk"])
-            a_personphoto.delete()
+            a_patronphoto.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except PatronPhotos.DoesNotExist:
             return Response(
